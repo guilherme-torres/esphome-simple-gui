@@ -1,0 +1,104 @@
+<!doctype html>
+
+<head lang="pt-br">
+  <meta charset="utf-8">
+  <title>Hello from Flask</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap/css/bootstrap.min.css') }}">
+  <script src="{{ url_for('static', filename='bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+</head>
+
+<body>
+  <div class="container py-5">
+    <div class="row justify-content-center">
+      <div class="col-md-7 col-lg-6">
+        <div class="card shadow">
+          <div class="card-header bg-primary text-white py-4">
+            <h3 class="mb-0 fs-4 fw-bold">Configuração do Dispositivo</h3>
+          </div>
+          <div class="card-body">
+            <form>
+              <div class="mb-3">
+                <label for="deviceName" class="form-label">Nome do dispositivo</label>
+                <input type="text" class="form-control" id="deviceName" name="deviceName" required>
+              </div>
+              <div class="mb-3">
+                <label for="platform" class="form-label">Plataforma</label>
+                <select class="form-select" id="platform" name="platform" required>
+                  <option selected value="esp8266">ESP8266</option>
+                </select>
+              </div>
+              <div class="mb-3">
+                <label for="board" class="form-label">Placa</label>
+                <select class="form-select" id="board" name="board" required>
+                  <option value="esp01_1m">ESP01 1M</option>
+                  <option value="esp12e">ESP12E</option>
+                  <option selected value="nodemcuv2">NodeMCU v2</option>
+                  <option value="d1_mini">D1 Mini</option>
+                  <option value="d1_mini_lite">D1 Mini Lite</option>
+                  <option value="esp8285">ESP8285</option>
+                  <option value="huzzah">Huzzah</option>
+                  <option value="sonoff_basic">Sonoff Basic</option>
+                  <option value="sonoff_s20">Sonoff S20</option>
+                  <option value="sonoff_sv">Sonoff SV</option>
+                  <option value="sonoff_4ch">Sonoff 4CH</option>
+                  <option value="sonoff_pow">Sonoff POW</option>
+                  <option value="sonoff_touch">Sonoff Touch</option>
+                  <option value="sonoff_dual">Sonoff Dual</option>
+                  <option value="sonoff_th">Sonoff TH</option>
+                  <option value="sonoff_rf">Sonoff RF</option>
+                  <option value="sonoff_ifan02">Sonoff iFan02</option>
+                  <option value="sonoff_ifan03">Sonoff iFan03</option>
+                  <option value="sonoff_t1_1">Sonoff T1 1</option>
+                  <option value="sonoff_t1_2">Sonoff T1 2</option>
+                  <option value="sonoff_t1_3">Sonoff T1 3</option>
+                  <option value="sonoff_t3_1">Sonoff T3 1</option>
+                  <option value="sonoff_t3_2">Sonoff T3 2</option>
+                  <option value="sonoff_t3_3">Sonoff T3 3</option>
+                  <option value="wemos_d1_mini_pro">Wemos D1 Mini Pro</option>
+                  <option value="esp07">ESP07</option>
+                  <option value="esp_wroom_02">ESP WROOM 02</option>
+                  <option value="espduino">ESPduino</option>
+                  <option value="espino">ESPino</option>
+                  <option value="oak">Oak</option>
+                  <option value="thing">Thing</option>
+                  <option value="modwifi">ModWiFi</option>
+                  <option value="esp01">ESP01</option>
+                  <option value="esp12">ESP12</option>
+                  <option value="esp07">ESP07</option>
+                  <option value="esp_wroom_02">ESP WROOM 02</option>
+                </select>
+              </div>
+              <hr>
+              <h5 class="mb-3">Rede Wi-Fi</h5>
+              <div class="mb-3">
+                <label for="wifiSsid" class="form-label">Nome da rede</label>
+                <input type="text" class="form-control" id="wifiSsid" name="wifiSsid" required>
+              </div>
+              <div class="mb-3">
+                <label for="wifiPassword" class="form-label">Senha</label>
+                <input type="password" class="form-control" id="wifiPassword" name="wifiPassword" required>
+              </div>
+              <hr>
+              <div class="form-check form-switch mb-3">
+                <input class="form-check-input" type="checkbox" id="otaProtected" onchange="toggleOtaPassword()">
+                <label class="form-check-label" for="otaProtected">Proteger atualizações OTA com senha</label>
+              </div>
+              <div class="mb-3" id="otaPasswordGroup" style="display: none;">
+                <label for="otaPassword" class="form-label">Senha OTA</label>
+                <input type="password" class="form-control" id="otaPassword" name="otaPassword">
+              </div>
+              <button type="submit" class="btn btn-primary w-100">Salvar</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    function toggleOtaPassword() {
+      const group = document.getElementById('otaPasswordGroup');
+      const checkbox = document.getElementById('otaProtected');
+      group.style.display = checkbox.checked ? 'block' : 'none';
+    }
+  </script>
+</body>
