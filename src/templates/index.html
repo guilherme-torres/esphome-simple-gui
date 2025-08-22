@@ -1,7 +1,8 @@
 <!doctype html>
 
 <head lang="pt-br">
-  <meta charset="utf-8">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Hello from Flask</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap/css/bootstrap.min.css') }}">
   <script src="{{ url_for('static', filename='bootstrap/js/bootstrap.bundle.min.js') }}"></script>
@@ -16,7 +17,7 @@
             <h3 class="mb-0 fs-4 fw-bold">Configuração do Dispositivo</h3>
           </div>
           <div class="card-body">
-            <form>
+            <form action="{{ url_for('create_device') }}" method="post">
               <div class="mb-3">
                 <label for="deviceName" class="form-label">Nome do dispositivo</label>
                 <input type="text" class="form-control" id="deviceName" name="deviceName" required>
@@ -30,42 +31,50 @@
               <div class="mb-3">
                 <label for="board" class="form-label">Placa</label>
                 <select class="form-select" id="board" name="board" required>
-                  <option value="esp01_1m">ESP01 1M</option>
-                  <option value="esp12e">ESP12E</option>
-                  <option selected value="nodemcuv2">NodeMCU v2</option>
-                  <option value="d1_mini">D1 Mini</option>
-                  <option value="d1_mini_lite">D1 Mini Lite</option>
-                  <option value="esp8285">ESP8285</option>
-                  <option value="huzzah">Huzzah</option>
+                  <option value="agruminolemon">Lifely Agrumino Lemon v4</option>
+                  <option value="d1_mini_lite">WeMos D1 mini Lite</option>
+                  <option value="d1_mini">WeMos D1 R2 and mini</option>
+                  <option value="d1_mini_pro">WeMos D1 mini Pro</option>
+                  <option value="d1">WEMOS D1 R1</option>
+                  <option value="eduinowifi">Schirmilabs Eduino WiFi</option>
+                  <option value="esp01_1m">Espressif Generic ESP8266 ESP-01 1M</option>
+                  <option value="esp01">Espressif Generic ESP8266 ESP-01 512k</option>
+                  <option value="esp07">Espressif Generic ESP8266 ESP-07 1MB</option>
+                  <option value="esp07s">Espressif Generic ESP8266 ESP-07S</option>
+                  <option value="esp12e">Espressif ESP8266 ESP-12E</option>
+                  <option value="esp210">SweetPea ESP-210</option>
+                  <option value="esp8285">Generic ESP8285 Module</option>
+                  <option value="espduino">ESPDuino (ESP-13 Module)</option>
+                  <option value="espectro">ESPectro Core</option>
+                  <option value="espino">ESPino</option>
+                  <option value="espinotee">ThaiEasyElec ESPino</option>
+                  <option value="espmxdevkit">ESP-Mx DevKit (ESP8285)</option>
+                  <option value="espresso_lite_v1">ESPresso Lite 1.0</option>
+                  <option value="espresso_lite_v2">ESPresso Lite 2.0</option>
+                  <option value="esp_wroom_02">ESP-WROOM-02</option>
+                  <option value="gen4iod">4D Systems gen4 IoD Range</option>
+                  <option value="heltec_wifi_kit_8">Heltec Wifi kit 8</option>
+                  <option value="huzzah">Adafruit HUZZAH ESP8266</option>
+                  <option value="inventone">Invent One</option>
+                  <option value="modwifi">Olimex MOD-WIFI-ESP8266(-DEV)</option>
+                  <option value="nodemcu">NodeMCU 0.9 (ESP-12 Module)</option>
+                  <option value="nodemcuv2" selected>NodeMCU 1.0 (ESP-12E Module)</option>
+                  <option value="oak">DigiStump Oak</option>
+                  <option value="phoenix_v1">Phoenix 1.0</option>
+                  <option value="phoenix_v2">Phoenix 2.0</option>
                   <option value="sonoff_basic">Sonoff Basic</option>
                   <option value="sonoff_s20">Sonoff S20</option>
                   <option value="sonoff_sv">Sonoff SV</option>
-                  <option value="sonoff_4ch">Sonoff 4CH</option>
-                  <option value="sonoff_pow">Sonoff POW</option>
-                  <option value="sonoff_touch">Sonoff Touch</option>
-                  <option value="sonoff_dual">Sonoff Dual</option>
                   <option value="sonoff_th">Sonoff TH</option>
-                  <option value="sonoff_rf">Sonoff RF</option>
-                  <option value="sonoff_ifan02">Sonoff iFan02</option>
-                  <option value="sonoff_ifan03">Sonoff iFan03</option>
-                  <option value="sonoff_t1_1">Sonoff T1 1</option>
-                  <option value="sonoff_t1_2">Sonoff T1 2</option>
-                  <option value="sonoff_t1_3">Sonoff T1 3</option>
-                  <option value="sonoff_t3_1">Sonoff T3 1</option>
-                  <option value="sonoff_t3_2">Sonoff T3 2</option>
-                  <option value="sonoff_t3_3">Sonoff T3 3</option>
-                  <option value="wemos_d1_mini_pro">Wemos D1 Mini Pro</option>
-                  <option value="esp07">ESP07</option>
-                  <option value="esp_wroom_02">ESP WROOM 02</option>
-                  <option value="espduino">ESPduino</option>
-                  <option value="espino">ESPino</option>
-                  <option value="oak">Oak</option>
-                  <option value="thing">Thing</option>
-                  <option value="modwifi">ModWiFi</option>
-                  <option value="esp01">ESP01</option>
-                  <option value="esp12">ESP12</option>
-                  <option value="esp07">ESP07</option>
-                  <option value="esp_wroom_02">ESP WROOM 02</option>
+                  <option value="sparkfunBlynk">SparkFun Blynk Board</option>
+                  <option value="thingdev">SparkFun ESP8266 Thing Dev</option>
+                  <option value="thing">SparkFun ESP8266 Thing</option>
+                  <option value="wifiduino">WiFiduino</option>
+                  <option value="wifinfo">WifInfo</option>
+                  <option value="wifi_slot">WiFi Slot</option>
+                  <option value="wio_link">Wio Link</option>
+                  <option value="wio_node">Wio Node</option>
+                  <option value="xinabox_cw01">XinaBox CW01</option>
                 </select>
               </div>
               <hr>
@@ -76,7 +85,13 @@
               </div>
               <div class="mb-3">
                 <label for="wifiPassword" class="form-label">Senha</label>
-                <input type="password" class="form-control" id="wifiPassword" name="wifiPassword" required>
+                <div class="input-group">
+                  <input type="password" class="form-control" id="wifiPassword" name="wifiPassword" required>
+                  <button class="btn btn-outline-secondary" type="button" id="toggleWifiPassword" tabindex="-1"
+                    onclick="toggleWifiPasswordVisibility()">
+                    <img id="wifiPasswordIcon" src="{{ url_for('static', filename='icons/eye.svg') }}" alt="mostrar senha">
+                  </button>
+                </div>
               </div>
               <hr>
               <div class="form-check form-switch mb-3">
@@ -99,6 +114,22 @@
       const group = document.getElementById('otaPasswordGroup');
       const checkbox = document.getElementById('otaProtected');
       group.style.display = checkbox.checked ? 'block' : 'none';
+    }
+
+    function toggleWifiPasswordVisibility() {
+      const input = document.getElementById('wifiPassword');
+      const btn = document.getElementById('toggleWifiPassword');
+      const wifiPasswordIcon = document.getElementById('wifiPasswordIcon')
+
+      if (input.type === 'password') {
+        input.type = 'text';
+        wifiPasswordIcon.src = "{{ url_for('static', filename='icons/eye-slash.svg') }}"
+        wifiPasswordIcon.alt = "ocultar senha"
+      } else {
+        input.type = 'password';
+        wifiPasswordIcon.src = "{{ url_for('static', filename='icons/eye.svg') }}"
+        wifiPasswordIcon.alt = "mostrar senha"
+      }
     }
   </script>
 </body>

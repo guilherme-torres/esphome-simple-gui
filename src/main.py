@@ -1,19 +1,13 @@
 import os
 import subprocess
 from string import Template
-from utils import generate_password
+from src.utils import generate_password
 import yaml
-from flask import Flask, render_template
+from flask import Flask, redirect, render_template, request, url_for
+from flask_alembic import Alembic
+from src.database.db import db
+from src.models import Device, Component
 
-# configuração básica
-
-data = {
-    "device_name": "quarto",
-    "platform": "ESP8266",
-    "board": "nodemcuv2",
-    "wifi": {"ssid": "brisa-Marka", "password": "gugu100317"},
-    "ota": {"password": ""},
-}
 
 basic_config_template = """
 esphome:
@@ -45,47 +39,79 @@ wifi:
 captive_portal:
 """
 
-basic_config_yaml_str = Template(basic_config_template).substitute(
-    name=data["device_name"], platform=data["platform"].lower(), board=data["board"], wifi_ssid=data["wifi"]["ssid"],
-    wifi_password=data["wifi"]["password"], ota_password=data["ota"]["password"],
-    ap_name=data["device_name"].title(), ap_password=generate_password()
-)
-
 dirname = "esphome_files"
-
-if not os.path.exists(dirname):
-    os.mkdir(dirname)
-
-file_dir = os.path.join(dirname, f"{data["device_name"]}.yaml")
-
-with open(file_dir, 'w') as yaml_file:
-    yaml_file.write(basic_config_yaml_str.strip() + "\n")
-
 
 # adicionar componente a configuração
 
-component = {
-    "switch": [
-        {
-            "platform": "gpio",
-            "name": "lampada",
-            "pin": "GPIO5"
-        }
-    ]
-}
+# component = {
+#     "switch": [
+#         {
+#             "platform": "gpio",
+#             "name": "lampada",
+#             "pin": "GPIO5"
+#         }
+#     ]
+# }
 
-def dict_to_yaml(obj):
-    return yaml.dump(obj, sort_keys=False)
+# def dict_to_yaml(obj):
+#     return yaml.dump(obj, sort_keys=False)
 
-with open(file_dir, "a") as yaml_file:
-    yaml_file.write("\n" + dict_to_yaml(component))
+# with open(file_dir, "a") as yaml_file:
+#     yaml_file.write("\n" + dict_to_yaml(component))
 
+alembic = Alembic()
 
 app = Flask(__name__)
+app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///database.db"
 
-@app.route("/")
-def main():
+db.init_app(app)
+alembic.init_app(app)
+
+@app.route("/", methods=["GET", "POST"])
+def create_device():
+    if request.method == "POST":
+        print(request.form)
+        if not os.path.exists(dirname):
+            os.mkdir(dirname)
+
+        file_dir = os.path.join(dirname, f"{request.form.get("deviceName")}.yaml")
+
+        device_exist = db.session.execute(db.select(Device).filter_by(config_file=file_dir)).scalar_one_or_none()
+
+        if device_exist:
+            print("O dispositivo já existe!", device_exist)
+            return render_template("index.html")
+
+        basic_config_yaml_str = Template(basic_config_template).substitute(
+            name=request.form.get("deviceName"), platform=request.form.get("platform").lower(), board=request.form.get("board"), wifi_ssid=request.form.get("wifiSsid"),
+            wifi_password=request.form.get("wifiPassword"), ota_password=request.form.get("otaPassword"),
+            ap_name=request.form.get("deviceName").title(), ap_password=generate_password()
+        )
+
+        with open(file_dir, 'w') as yaml_file:
+            yaml_file.write(basic_config_yaml_str.strip() + "\n")
+
+        device = Device(
+            name=request.form.get("deviceName"),
+            platform=request.form.get("platform"),
+            board=request.form.get("board"),
+            wifi_ssid=request.form.get("wifiSsid"),
+            wifi_password=request.form.get("wifiPassword"),
+            ota_password=request.form.get("otaPassword"),
+            config_file=file_dir,
+        )
+
+        db.session.add(device)
+        db.session.commit()
+        
+        return redirect(url_for("list_devices"))
     return render_template("index.html")
+
+@app.route("/devices")
+def list_devices():
+    devices = db.session.execute(db.select(Device)).scalars().all()
+    print(devices)
+    return render_template("devices.html", devices=devices)
 
 # process = subprocess.Popen(
 #     ["esphome", "run", file_dir, "--device", "/dev/ttyUSB0"],
