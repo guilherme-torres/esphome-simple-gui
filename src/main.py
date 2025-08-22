@@ -67,51 +67,63 @@ app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///database.db"
 db.init_app(app)
 alembic.init_app(app)
 
-@app.route("/", methods=["GET", "POST"])
+@app.route("/create-device", methods=["POST"])
 def create_device():
-    if request.method == "POST":
-        print(request.form)
-        if not os.path.exists(dirname):
-            os.mkdir(dirname)
+    print(request.form)
+    if not os.path.exists(dirname):
+        os.mkdir(dirname)
 
-        file_dir = os.path.join(dirname, f"{request.form.get("deviceName")}.yaml")
+    file_dir = os.path.join(dirname, f"{request.form.get("deviceName")}.yaml")
 
-        device_exist = db.session.execute(db.select(Device).filter_by(config_file=file_dir)).scalar_one_or_none()
+    device_exist = db.session.execute(db.select(Device).filter_by(config_file=file_dir)).scalar_one_or_none()
 
-        if device_exist:
-            print("O dispositivo já existe!", device_exist)
-            return render_template("index.html")
+    if device_exist:
+        print("O dispositivo já existe!", device_exist)
+        return render_template("index.html")
 
-        basic_config_yaml_str = Template(basic_config_template).substitute(
-            name=request.form.get("deviceName"), platform=request.form.get("platform").lower(), board=request.form.get("board"), wifi_ssid=request.form.get("wifiSsid"),
-            wifi_password=request.form.get("wifiPassword"), ota_password=request.form.get("otaPassword"),
-            ap_name=request.form.get("deviceName").title(), ap_password=generate_password()
-        )
+    basic_config_yaml_str = Template(basic_config_template).substitute(
+        name=request.form.get("deviceName"), platform=request.form.get("platform").lower(), board=request.form.get("board"), wifi_ssid=request.form.get("wifiSsid"),
+        wifi_password=request.form.get("wifiPassword"), ota_password="",
+        ap_name=request.form.get("deviceName").title(), ap_password=generate_password()
+    )
 
-        with open(file_dir, 'w') as yaml_file:
-            yaml_file.write(basic_config_yaml_str.strip() + "\n")
+    with open(file_dir, 'w') as yaml_file:
+        yaml_file.write(basic_config_yaml_str.strip() + "\n")
 
-        device = Device(
-            name=request.form.get("deviceName"),
-            platform=request.form.get("platform"),
-            board=request.form.get("board"),
-            wifi_ssid=request.form.get("wifiSsid"),
-            wifi_password=request.form.get("wifiPassword"),
-            ota_password=request.form.get("otaPassword"),
-            config_file=file_dir,
-        )
+    device = Device(
+        name=request.form.get("deviceName"),
+        platform=request.form.get("platform"),
+        board=request.form.get("board"),
+        wifi_ssid=request.form.get("wifiSsid"),
+        wifi_password=request.form.get("wifiPassword"),
+        ota_password=request.form.get("otaPassword"),
+        config_file=file_dir,
+    )
 
-        db.session.add(device)
-        db.session.commit()
-        
-        return redirect(url_for("list_devices"))
-    return render_template("index.html")
+    db.session.add(device)
+    db.session.commit()
+    
+    return redirect(url_for("list_devices"))
 
-@app.route("/devices")
+@app.route("/")
 def list_devices():
     devices = db.session.execute(db.select(Device)).scalars().all()
     print(devices)
-    return render_template("devices.html", devices=devices)
+    return render_template("index.html", devices=devices)
+
+@app.route("/delete-device/<int:device_id>", methods=["POST"])
+def delete_device(device_id):
+    device = db.session.get(Device, device_id)
+    if device:
+        config_file_path = device.config_file
+        print("deletendo dispositivo do bd", device)
+        db.session.delete(device)
+        db.session.commit()
+        print("deletando arquivo de configuração do dispositivo")
+        if os.path.exists(config_file_path):
+            os.remove(config_file_path)
+        return redirect(url_for("list_devices"))
+    return redirect(url_for("list_devices"))
 
 # process = subprocess.Popen(
 #     ["esphome", "run", file_dir, "--device", "/dev/ttyUSB0"],
