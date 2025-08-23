@@ -1,7 +1,7 @@
 import os
 import subprocess
 from string import Template
-from src.utils import generate_password
+from src.utils import generate_password, list_serial_ports
 from flask import Flask, redirect, render_template, request, url_for
 from flask_alembic import Alembic
 from src.database.db import db
@@ -173,12 +173,28 @@ def edit_device(device_id):
         return redirect(url_for("list_devices"))
     return render_template("edit-device.html", device=device)
 
-# process = subprocess.Popen(
-#     ["esphome", "run", file_dir, "--device", "/dev/ttyUSB0"],
-#     stdout=subprocess.PIPE,
-#     stderr=subprocess.STDOUT,
-#     text=True
-# )
+@app.route("/upload-config/<int:device_id>", methods=["POST"])
+def upload_config(device_id):
+    device = db.session.get(Device, device_id)
+    if device:
+        print("fazendo upload para o dispositivo", device.config_file)
+        serial_port = request.form.get("serial_port")
+        if serial_port:
+            print("porta", serial_port)
+            # process = subprocess.Popen(
+            #     ["esphome", "run", device.config_file, "--device", serial_port],
+            #     stdout=subprocess.PIPE,
+            #     stderr=subprocess.STDOUT,
+            #     text=True
+            # )
+            # for line in process.stdout:
+            #     print(line, end="")
+            return redirect(url_for("list_devices"))
+        print("porta serial não selecionada")
+        return redirect(url_for("list_devices"))
+    print("dispositivo não encontrado")
+    return redirect(url_for("list_devices"))
 
-# for line in process.stdout:
-#     print(line, end="")
+@app.route("/available-ports")
+def list_available_ports():
+    return list_serial_ports()
