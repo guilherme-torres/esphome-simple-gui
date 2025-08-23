@@ -14,5 +14,7 @@ class Device(db.Model):
     wifi_password: Mapped[Optional[str]]
     ota_password: Mapped[Optional[str]]
     config_file: Mapped[str] = mapped_column(unique=True)
+    ap_ssid: Mapped[str] = mapped_column(unique=True)
+    ap_password: Mapped[str]
 
     components: Mapped[List["Component"]] = relationship(back_populates="device")

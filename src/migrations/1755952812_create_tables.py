@@ -1,8 +1,8 @@
 """create tables
 
-Revision ID: 1755868906
+Revision ID: 1755952812
 Revises: 
-Create Date: 2025-08-22 10:21:46.042387
+Create Date: 2025-08-23 09:40:12.485286
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '1755868906'
+revision: str = '1755952812'
 down_revision: Union[str, Sequence[str], None] = None
 branch_labels: Union[str, Sequence[str], None] = ('default',)
 depends_on: Union[str, Sequence[str], None] = None
@@ -30,7 +30,10 @@ def upgrade() -> None:
     sa.Column('wifi_password', sa.String(), nullable=True),
     sa.Column('ota_password', sa.String(), nullable=True),
     sa.Column('config_file', sa.String(), nullable=False),
+    sa.Column('ap_ssid', sa.String(), nullable=False),
+    sa.Column('ap_password', sa.String(), nullable=False),
     sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('ap_ssid'),
     sa.UniqueConstraint('config_file'),
     sa.UniqueConstraint('name')
     )
@@ -39,7 +42,6 @@ def upgrade() -> None:
     sa.Column('component_type', sa.String(), nullable=False),
     sa.Column('platform', sa.String(), nullable=False),
     sa.Column('name', sa.String(), nullable=False),
-    sa.Column('pin', sa.String(), nullable=False),
     sa.Column('config_json', sa.String(), nullable=False),
     sa.Column('device_id', sa.Integer(), nullable=False),
     sa.ForeignKeyConstraint(['device_id'], ['device.id'], ),

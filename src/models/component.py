@@ -11,7 +11,6 @@ class Component(db.Model):
     component_type: Mapped[str]
     platform: Mapped[str]
     name: Mapped[str]
-    pin: Mapped[str]
     config_json: Mapped[str]
     device_id: Mapped[int] = mapped_column(ForeignKey("device.id"))
 
