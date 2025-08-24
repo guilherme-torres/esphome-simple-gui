@@ -10,80 +10,114 @@
 </head>
 
 <body>
-    <div class="container mt-4">
+    <div class="container my-4">
         <h1 class="mb-4 fw-bold">Editar dispositivo: {{ device.name }}</h1>
         <form action="{{ url_for('edit_device', device_id=device.id) }}" method="post">
             <div class="mb-3">
                 <label for="deviceName" class="form-label">Nome do dispositivo</label>
-                <input type="text" class="form-control" id="deviceName" name="deviceName" required value="{{ device.name }}">
+                <input type="text" class="form-control" id="deviceName" name="deviceName" required
+                    value="{{ device.name }}">
             </div>
             <div class="mb-3">
                 <label for="platform" class="form-label">Plataforma</label>
                 <select class="form-select" id="platform" name="platform" required>
-                    <option value="esp8266" {% if device.platform == 'esp8266' %}selected{% endif %}>ESP8266</option>
+                    <option value="esp8266" {% if device.platform=='esp8266' %}selected{% endif %}>ESP8266</option>
                 </select>
             </div>
             <div class="mb-3">
                 <label for="board" class="form-label">Placa</label>
                 <select class="form-select" id="board" name="board" required>
-                    <option value="agruminolemon" {% if device.board == 'agruminolemon' %}selected{% endif %}>Lifely Agrumino Lemon v4</option>
-                    <option value="d1_mini_lite" {% if device.board == 'd1_mini_lite' %}selected{% endif %}>WeMos D1 mini Lite</option>
-                    <option value="d1_mini" {% if device.board == 'd1_mini' %}selected{% endif %}>WeMos D1 R2 and mini</option>
-                    <option value="d1_mini_pro" {% if device.board == 'd1_mini_pro' %}selected{% endif %}>WeMos D1 mini Pro</option>
-                    <option value="d1" {% if device.board == 'd1' %}selected{% endif %}>WEMOS D1 R1</option>
-                    <option value="eduinowifi" {% if device.board == 'eduinowifi' %}selected{% endif %}>Schirmilabs Eduino WiFi</option>
-                    <option value="esp01_1m" {% if device.board == 'esp01_1m' %}selected{% endif %}>Espressif Generic ESP8266 ESP-01 1M</option>
-                    <option value="esp01" {% if device.board == 'esp01' %}selected{% endif %}>Espressif Generic ESP8266 ESP-01 512k</option>
-                    <option value="esp07" {% if device.board == 'esp07' %}selected{% endif %}>Espressif Generic ESP8266 ESP-07 1MB</option>
-                    <option value="esp07s" {% if device.board == 'esp07s' %}selected{% endif %}>Espressif Generic ESP8266 ESP-07S</option>
-                    <option value="esp12e" {% if device.board == 'esp12e' %}selected{% endif %}>Espressif ESP8266 ESP-12E</option>
-                    <option value="esp210" {% if device.board == 'esp210' %}selected{% endif %}>SweetPea ESP-210</option>
-                    <option value="esp8285" {% if device.board == 'esp8285' %}selected{% endif %}>Generic ESP8285 Module</option>
-                    <option value="espduino" {% if device.board == 'espduino' %}selected{% endif %}>ESPDuino (ESP-13 Module)</option>
-                    <option value="espectro" {% if device.board == 'espectro' %}selected{% endif %}>ESPectro Core</option>
-                    <option value="espino" {% if device.board == 'espino' %}selected{% endif %}>ESPino</option>
-                    <option value="espinotee" {% if device.board == 'espinotee' %}selected{% endif %}>ThaiEasyElec ESPino</option>
-                    <option value="espmxdevkit" {% if device.board == 'espmxdevkit' %}selected{% endif %}>ESP-Mx DevKit (ESP8285)</option>
-                    <option value="espresso_lite_v1" {% if device.board == 'espresso_lite_v1' %}selected{% endif %}>ESPresso Lite 1.0</option>
-                    <option value="espresso_lite_v2" {% if device.board == 'espresso_lite_v2' %}selected{% endif %}>ESPresso Lite 2.0</option>
-                    <option value="esp_wroom_02" {% if device.board == 'esp_wroom_02' %}selected{% endif %}>ESP-WROOM-02</option>
-                    <option value="gen4iod" {% if device.board == 'gen4iod' %}selected{% endif %}>4D Systems gen4 IoD Range</option>
-                    <option value="heltec_wifi_kit_8" {% if device.board == 'heltec_wifi_kit_8' %}selected{% endif %}>Heltec Wifi kit 8</option>
-                    <option value="huzzah" {% if device.board == 'huzzah' %}selected{% endif %}>Adafruit HUZZAH ESP8266</option>
-                    <option value="inventone" {% if device.board == 'inventone' %}selected{% endif %}>Invent One</option>
-                    <option value="modwifi" {% if device.board == 'modwifi' %}selected{% endif %}>Olimex MOD-WIFI-ESP8266(-DEV)</option>
-                    <option value="nodemcu" {% if device.board == 'nodemcu' %}selected{% endif %}>NodeMCU 0.9 (ESP-12 Module)</option>
-                    <option value="nodemcuv2" {% if device.board == 'nodemcuv2' %}selected{% endif %}>NodeMCU 1.0 (ESP-12E Module)</option>
-                    <option value="oak" {% if device.board == 'oak' %}selected{% endif %}>DigiStump Oak</option>
-                    <option value="phoenix_v1" {% if device.board == 'phoenix_v1' %}selected{% endif %}>Phoenix 1.0</option>
-                    <option value="phoenix_v2" {% if device.board == 'phoenix_v2' %}selected{% endif %}>Phoenix 2.0</option>
-                    <option value="sonoff_basic" {% if device.board == 'sonoff_basic' %}selected{% endif %}>Sonoff Basic</option>
-                    <option value="sonoff_s20" {% if device.board == 'sonoff_s20' %}selected{% endif %}>Sonoff S20</option>
-                    <option value="sonoff_sv" {% if device.board == 'sonoff_sv' %}selected{% endif %}>Sonoff SV</option>
-                    <option value="sonoff_th" {% if device.board == 'sonoff_th' %}selected{% endif %}>Sonoff TH</option>
-                    <option value="sparkfunBlynk" {% if device.board == 'sparkfunBlynk' %}selected{% endif %}>SparkFun Blynk Board</option>
-                    <option value="thingdev" {% if device.board == 'thingdev' %}selected{% endif %}>SparkFun ESP8266 Thing Dev</option>
-                    <option value="thing" {% if device.board == 'thing' %}selected{% endif %}>SparkFun ESP8266 Thing</option>
-                    <option value="wifiduino" {% if device.board == 'wifiduino' %}selected{% endif %}>WiFiduino</option>
-                    <option value="wifinfo" {% if device.board == 'wifinfo' %}selected{% endif %}>WifInfo</option>
-                    <option value="wifi_slot" {% if device.board == 'wifi_slot' %}selected{% endif %}>WiFi Slot</option>
-                    <option value="wio_link" {% if device.board == 'wio_link' %}selected{% endif %}>Wio Link</option>
-                    <option value="wio_node" {% if device.board == 'wio_node' %}selected{% endif %}>Wio Node</option>
-                    <option value="xinabox_cw01" {% if device.board == 'xinabox_cw01' %}selected{% endif %}>XinaBox CW01</option>
+                    <option value="agruminolemon" {% if device.board=='agruminolemon' %}selected{% endif %}>Lifely
+                        Agrumino Lemon v4</option>
+                    <option value="d1_mini_lite" {% if device.board=='d1_mini_lite' %}selected{% endif %}>WeMos D1 mini
+                        Lite</option>
+                    <option value="d1_mini" {% if device.board=='d1_mini' %}selected{% endif %}>WeMos D1 R2 and mini
+                    </option>
+                    <option value="d1_mini_pro" {% if device.board=='d1_mini_pro' %}selected{% endif %}>WeMos D1 mini
+                        Pro</option>
+                    <option value="d1" {% if device.board=='d1' %}selected{% endif %}>WEMOS D1 R1</option>
+                    <option value="eduinowifi" {% if device.board=='eduinowifi' %}selected{% endif %}>Schirmilabs Eduino
+                        WiFi</option>
+                    <option value="esp01_1m" {% if device.board=='esp01_1m' %}selected{% endif %}>Espressif Generic
+                        ESP8266 ESP-01 1M</option>
+                    <option value="esp01" {% if device.board=='esp01' %}selected{% endif %}>Espressif Generic ESP8266
+                        ESP-01 512k</option>
+                    <option value="esp07" {% if device.board=='esp07' %}selected{% endif %}>Espressif Generic ESP8266
+                        ESP-07 1MB</option>
+                    <option value="esp07s" {% if device.board=='esp07s' %}selected{% endif %}>Espressif Generic ESP8266
+                        ESP-07S</option>
+                    <option value="esp12e" {% if device.board=='esp12e' %}selected{% endif %}>Espressif ESP8266 ESP-12E
+                    </option>
+                    <option value="esp210" {% if device.board=='esp210' %}selected{% endif %}>SweetPea ESP-210</option>
+                    <option value="esp8285" {% if device.board=='esp8285' %}selected{% endif %}>Generic ESP8285 Module
+                    </option>
+                    <option value="espduino" {% if device.board=='espduino' %}selected{% endif %}>ESPDuino (ESP-13
+                        Module)</option>
+                    <option value="espectro" {% if device.board=='espectro' %}selected{% endif %}>ESPectro Core</option>
+                    <option value="espino" {% if device.board=='espino' %}selected{% endif %}>ESPino</option>
+                    <option value="espinotee" {% if device.board=='espinotee' %}selected{% endif %}>ThaiEasyElec ESPino
+                    </option>
+                    <option value="espmxdevkit" {% if device.board=='espmxdevkit' %}selected{% endif %}>ESP-Mx DevKit
+                        (ESP8285)</option>
+                    <option value="espresso_lite_v1" {% if device.board=='espresso_lite_v1' %}selected{% endif %}>
+                        ESPresso Lite 1.0</option>
+                    <option value="espresso_lite_v2" {% if device.board=='espresso_lite_v2' %}selected{% endif %}>
+                        ESPresso Lite 2.0</option>
+                    <option value="esp_wroom_02" {% if device.board=='esp_wroom_02' %}selected{% endif %}>ESP-WROOM-02
+                    </option>
+                    <option value="gen4iod" {% if device.board=='gen4iod' %}selected{% endif %}>4D Systems gen4 IoD
+                        Range</option>
+                    <option value="heltec_wifi_kit_8" {% if device.board=='heltec_wifi_kit_8' %}selected{% endif %}>
+                        Heltec Wifi kit 8</option>
+                    <option value="huzzah" {% if device.board=='huzzah' %}selected{% endif %}>Adafruit HUZZAH ESP8266
+                    </option>
+                    <option value="inventone" {% if device.board=='inventone' %}selected{% endif %}>Invent One</option>
+                    <option value="modwifi" {% if device.board=='modwifi' %}selected{% endif %}>Olimex
+                        MOD-WIFI-ESP8266(-DEV)</option>
+                    <option value="nodemcu" {% if device.board=='nodemcu' %}selected{% endif %}>NodeMCU 0.9 (ESP-12
+                        Module)</option>
+                    <option value="nodemcuv2" {% if device.board=='nodemcuv2' %}selected{% endif %}>NodeMCU 1.0 (ESP-12E
+                        Module)</option>
+                    <option value="oak" {% if device.board=='oak' %}selected{% endif %}>DigiStump Oak</option>
+                    <option value="phoenix_v1" {% if device.board=='phoenix_v1' %}selected{% endif %}>Phoenix 1.0
+                    </option>
+                    <option value="phoenix_v2" {% if device.board=='phoenix_v2' %}selected{% endif %}>Phoenix 2.0
+                    </option>
+                    <option value="sonoff_basic" {% if device.board=='sonoff_basic' %}selected{% endif %}>Sonoff Basic
+                    </option>
+                    <option value="sonoff_s20" {% if device.board=='sonoff_s20' %}selected{% endif %}>Sonoff S20
+                    </option>
+                    <option value="sonoff_sv" {% if device.board=='sonoff_sv' %}selected{% endif %}>Sonoff SV</option>
+                    <option value="sonoff_th" {% if device.board=='sonoff_th' %}selected{% endif %}>Sonoff TH</option>
+                    <option value="sparkfunBlynk" {% if device.board=='sparkfunBlynk' %}selected{% endif %}>SparkFun
+                        Blynk Board</option>
+                    <option value="thingdev" {% if device.board=='thingdev' %}selected{% endif %}>SparkFun ESP8266 Thing
+                        Dev</option>
+                    <option value="thing" {% if device.board=='thing' %}selected{% endif %}>SparkFun ESP8266 Thing
+                    </option>
+                    <option value="wifiduino" {% if device.board=='wifiduino' %}selected{% endif %}>WiFiduino</option>
+                    <option value="wifinfo" {% if device.board=='wifinfo' %}selected{% endif %}>WifInfo</option>
+                    <option value="wifi_slot" {% if device.board=='wifi_slot' %}selected{% endif %}>WiFi Slot</option>
+                    <option value="wio_link" {% if device.board=='wio_link' %}selected{% endif %}>Wio Link</option>
+                    <option value="wio_node" {% if device.board=='wio_node' %}selected{% endif %}>Wio Node</option>
+                    <option value="xinabox_cw01" {% if device.board=='xinabox_cw01' %}selected{% endif %}>XinaBox CW01
+                    </option>
                 </select>
             </div>
             <hr>
             <h5 class="mb-3">Rede Wi-Fi</h5>
             <div class="mb-3">
                 <label for="wifiSsid" class="form-label">Nome da rede</label>
-                <input type="text" class="form-control" id="wifiSsid" name="wifiSsid" required value="{{ device.wifiSsid }}">
+                <input type="text" class="form-control" id="wifiSsid" name="wifiSsid" required
+                    value="{{ device.wifiSsid }}">
             </div>
             <div class="mb-3">
                 <label for="wifiPassword" class="form-label">Senha</label>
                 <div class="input-group">
-                    <input type="password" class="form-control" id="wifiPassword" name="wifiPassword" required value="{{ device.wifiPassword }}">
-                    <button class="btn btn-outline-secondary" type="button" id="toggleWifiPassword"
-                        tabindex="-1" onclick="toggleWifiPasswordVisibility()">
+                    <input type="password" class="form-control" id="wifiPassword" name="wifiPassword" required
+                        value="{{ device.wifiPassword }}">
+                    <button class="btn btn-outline-secondary" type="button" id="toggleWifiPassword" tabindex="-1"
+                        onclick="toggleWifiPasswordVisibility()">
                         <img id="wifiPasswordIcon" src="{{ url_for('static', filename='icons/eye.svg') }}"
                             alt="mostrar senha">
                     </button>
@@ -106,29 +140,96 @@
                 <button type="submit" class="btn btn-success">Salvar</button>
             </div>
         </form>
-    </div>
-    <script>
-        /*function toggleOtaPassword() {
-            const group = document.getElementById('otaPasswordGroup');
-            const checkbox = document.getElementById('otaProtected');
-            group.style.display = checkbox.checked ? 'block' : 'none';
-        }*/
 
-        function toggleWifiPasswordVisibility() {
-            const input = document.getElementById('wifiPassword');
-            const wifiPasswordIcon = document.getElementById('wifiPasswordIcon')
+        <h2 class="mt-5 mb-3 fw-bold">Componentes</h2>
+        <div class="row">
+            {% for component in device.components %}
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ component.name }}</h5>
+                        <p class="card-text mb-1"><strong>Tipo:</strong> {{ component.component_type }}</p>
+                        <p class="card-text mb-1"><strong>Plataforma:</strong> {{ component.platform }}</p>
+                        <pre class="card-text bg-light p-2 rounded"
+                            style="font-size: 0.9em;">{{ component.config_json }}</pre>
+                        <div class="d-flex justify-content-end gap-2 mt-3">
+                            <button class="btn btn-outline-primary btn-sm" type="button">Editar</button>
+                            <form action="{{ url_for('delete_component', device_id=device.id, component_id=component.id) }}" method="post">
+                                <button class="btn btn-outline-danger btn-sm" type="submit">Excluir</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            <form action="{{ url_for('add_component', device_id=device.id) }}" method="post">
+                <button type="button" class="btn btn-outline-primary w-100 py-3 border-dashed border-2"
+                    style="border-style: dashed" data-bs-toggle="modal" data-bs-target="#addComponentModal">
+                    + Adicionar componente
+                </button>
 
-            if (input.type === 'password') {
-                input.type = 'text';
-                wifiPasswordIcon.src = "{{ url_for('static', filename='icons/eye-slash.svg') }}"
-                wifiPasswordIcon.alt = "ocultar senha"
-            } else {
-                input.type = 'password';
-                wifiPasswordIcon.src = "{{ url_for('static', filename='icons/eye.svg') }}"
-                wifiPasswordIcon.alt = "mostrar senha"
+                <div class="modal fade" id="addComponentModal" tabindex="-1"
+                    aria-labelledby="addComponentModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h1 class="modal-title fs-5" id="addComponentModalLabel">Novo componente</h1>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="mb-3">
+                                    <label for="componentName" class="form-label">Nome do componente</label>
+                                    <input type="text" class="form-control" id="componentName" name="componentName" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="componentType" class="form-label">Tipo</label>
+                                    <select class="form-select" id="componentType" name="componentType" required>
+                                        <option value="switch" selected>Switch</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="componentPlatform" class="form-label">Plataforma</label>
+                                    <select class="form-select" id="componentPlatform" name="componentPlatform" required>
+                                        <option value="gpio" selected>GPIO</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    {{ form.pin.label(class="form-label") }} {{ form.pin(class="form-select") }}
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                <button type="submit" class="btn btn-success">Salvar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <script>
+            /*function toggleOtaPassword() {
+                const group = document.getElementById('otaPasswordGroup');
+                const checkbox = document.getElementById('otaProtected');
+                group.style.display = checkbox.checked ? 'block' : 'none';
+            }*/
+
+            function toggleWifiPasswordVisibility() {
+                const input = document.getElementById('wifiPassword');
+                const wifiPasswordIcon = document.getElementById('wifiPasswordIcon')
+
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    wifiPasswordIcon.src = "{{ url_for('static', filename='icons/eye-slash.svg') }}"
+                    wifiPasswordIcon.alt = "ocultar senha"
+                } else {
+                    input.type = 'password';
+                    wifiPasswordIcon.src = "{{ url_for('static', filename='icons/eye.svg') }}"
+                    wifiPasswordIcon.alt = "mostrar senha"
+                }
             }
-        }
-    </script>
+        </script>
 </body>
 
 </html>

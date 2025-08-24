@@ -17,4 +17,4 @@ class Device(db.Model):
     ap_ssid: Mapped[str] = mapped_column(unique=True)
     ap_password: Mapped[str]
 
-    components: Mapped[List["Component"]] = relationship(back_populates="device")
+    components: Mapped[List["Component"]] = relationship(back_populates="device", cascade="all, delete-orphan")
