@@ -24,61 +24,62 @@
                     <div class="card-body">
                         <h5 class="card-title">{{ device.name }}</h5>
                         <div class="mt-3 d-flex justify-content-end gap-2">
-                            <form action="{{ url_for('upload_config', device_id=device.id) }}" method="post">
-                                <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal"
-                                    data-bs-target="#confirmUploadModal{{ device.id }}">
-                                    Upload
-                                </button>
+                            <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal"
+                                data-bs-target="#confirmUploadModal{{ device.id }}">
+                                Upload
+                            </button>
 
-                                <div class="modal fade" id="confirmUploadModal{{ device.id }}" tabindex="-1"
-                                    aria-labelledby="confirmUploadModalLabel{{ device.id }}" aria-hidden="true">
-                                    <div class="modal-dialog">
-                                        <div class="modal-content">
-                                            <form action="{{ url_for('upload_config', device_id=device.id) }}"
-                                                method="post">
-                                                <div class="modal-header">
-                                                    <h5 class="modal-title" id="confirmUploadModalLabel{{ device.id }}">
-                                                        Atenção!</h5>
-                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                                        aria-label="Fechar"></button>
+                            <div class="modal fade" id="confirmUploadModal{{ device.id }}" tabindex="-1"
+                                aria-labelledby="confirmUploadModalLabel{{ device.id }}" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="confirmUploadModalLabel{{ device.id }}">
+                                                Atenção!</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                aria-label="Fechar"></button>
+                                        </div>
+                                        <div class="modal-body" id="uploadSection{{ device.id }}">
+                                            <p class="fw-bold">Certifique-se de conectar seu dispositivo ESP no
+                                                computador através da porta USB.</p>
+                                            <div class="mb-3">
+                                                <label for="serialPortSelect{{ device.id }}"
+                                                    class="form-label">Selecione a porta serial</label>
+                                                <select class="form-select" id="serialPortSelect{{ device.id }}"
+                                                    onclick="fetchSerialPorts({{ device.id }})" disabled>
+                                                    <option value="">Clique para buscar portas...</option>
+                                                </select>
+                                                <div id="serialPortLoading{{ device.id }}" class="form-text text-muted"
+                                                    style="display:none;">
+                                                    Carregando portas seriais...
                                                 </div>
-                                                <div class="modal-body">
-                                                    <p class="fw-bold">Certifique-se de conectar seu dispositivo ESP no
-                                                        computador através da porta USB.</p>
-                                                    <div class="mb-3">
-                                                        <label for="serialPortSelect{{ device.id }}"
-                                                            class="form-label">Selecione a porta serial</label>
-                                                        <select class="form-select" id="serialPortSelect{{ device.id }}"
-                                                            name="serial_port"
-                                                            onclick="fetchSerialPorts({{ device.id }})" disabled>
-                                                            <option value="">Clique para buscar portas...</option>
-                                                        </select>
-                                                        <div id="serialPortLoading{{ device.id }}"
-                                                            class="form-text text-muted" style="display:none;">
-                                                            Carregando portas seriais...
-                                                        </div>
-                                                    </div>
-                                                    <div class="form-check mb-3">
-                                                        <input class="form-check-input" type="checkbox"
-                                                            id="usbConfirm{{ device.id }}"
-                                                            onchange="document.getElementById('confirmUploadBtn{{ device.id }}').disabled = !this.checked;">
-                                                        <label class="form-check-label" for="usbConfirm{{ device.id }}">
-                                                            Meu dispositivo ESP já está conectado.
-                                                        </label>
-                                                    </div>
-                                                </div>
-                                                <div class="modal-footer">
-                                                    <button type="button" class="btn btn-secondary"
-                                                        data-bs-dismiss="modal">Cancelar</button>
-                                                    <button type="submit" class="btn btn-success"
-                                                        id="confirmUploadBtn{{ device.id }}" disabled>Confirmar
-                                                        upload</button>
-                                                </div>
-                                            </form>
+                                            </div>
+                                            <div class="form-check mb-3">
+                                                <input class="form-check-input" type="checkbox"
+                                                    id="usbConfirm{{ device.id }}"
+                                                    onchange="document.getElementById('confirmUploadBtn{{ device.id }}').disabled = !this.checked;">
+                                                <label class="form-check-label" for="usbConfirm{{ device.id }}">
+                                                    Meu dispositivo ESP já está conectado.
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="modal-body" id="logSection{{ device.id }}" style="display: none;">
+                                            <h6 class="fw-bold">Logs:</h6>
+                                            <pre id="logs{{ device.id }}"
+                                                style="background-color: #1e1e1e; color: #dcdcdc; padding: 10px; height: 300px; overflow-y: auto;"></pre>
+                                        </div>
+
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary"
+                                                data-bs-dismiss="modal">Cancelar</button>
+                                            <button type="button" class="btn btn-success"
+                                                id="confirmUploadBtn{{ device.id }}"
+                                                onclick="startUpload({{ device.id }})" disabled>Confirmar
+                                                upload</button>
                                         </div>
                                     </div>
                                 </div>
-                            </form>
+                            </div>
                             <a href="{{ url_for('edit_device', device_id=device.id) }}"
                                 class="btn btn-primary btn-sm">Editar</a>
                             <form action="{{ url_for('delete_device', device_id=device.id) }}" method="post">
@@ -231,7 +232,44 @@
         </div>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
     <script>
+        const socket = io();
+
+        function startUpload(deviceId) {
+            const serialPort = document.getElementById('serialPortSelect' + deviceId).value;
+            if (!serialPort) {
+                alert("Selecione uma porta serial!");
+                return;
+            }
+
+            //document.getElementById('uploadSection' + deviceId).style.display = 'none';
+            document.getElementById('logSection' + deviceId).style.display = 'block';
+
+            //const logElement = document.getElementById('logs' + deviceId);
+            //logElement.textContent = "Iniciando upload...\n";
+
+            socket.emit('start_upload', {
+                device_id: deviceId,
+                serial_port: serialPort
+            });
+        }
+
+        socket.on('log', function (data) {
+            const logElement = document.getElementById('logs' + data.device_id);
+            if (logElement) {
+                logElement.textContent += data.line;
+                logElement.scrollTop = logElement.scrollHeight;
+            }
+        });
+
+        /*socket.on('upload_done', function (data) {
+            const logElement = document.getElementById('logs' + data.device_id);
+            if (logElement) {
+                logElement.textContent += "\n[Upload finalizado]";
+            }
+        });*/
+
         /*function toggleOtaPassword() {
             const group = document.getElementById('otaPasswordGroup');
             const checkbox = document.getElementById('otaProtected');
@@ -258,7 +296,6 @@
             const select = document.getElementById('serialPortSelect' + deviceId);
             const loading = document.getElementById('serialPortLoading' + deviceId);
 
-            // Evita múltiplas requisições
             if (select.options.length > 1) return;
 
             select.disabled = true;
@@ -289,7 +326,6 @@
                 });
         }
 
-        // Habilita o select quando o modal é aberto
         document.addEventListener('shown.bs.modal', function (event) {
             const modal = event.target;
             if (modal.id.startsWith('confirmUploadModal')) {

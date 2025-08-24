@@ -109,13 +109,13 @@
             <div class="mb-3">
                 <label for="wifiSsid" class="form-label">Nome da rede</label>
                 <input type="text" class="form-control" id="wifiSsid" name="wifiSsid" required
-                    value="{{ device.wifiSsid }}">
+                    value="{{ device.wifi_ssid }}">
             </div>
             <div class="mb-3">
                 <label for="wifiPassword" class="form-label">Senha</label>
                 <div class="input-group">
                     <input type="password" class="form-control" id="wifiPassword" name="wifiPassword" required
-                        value="{{ device.wifiPassword }}">
+                        value="{{ device.wifi_password }}">
                     <button class="btn btn-outline-secondary" type="button" id="toggleWifiPassword" tabindex="-1"
                         onclick="toggleWifiPasswordVisibility()">
                         <img id="wifiPasswordIcon" src="{{ url_for('static', filename='icons/eye.svg') }}"
