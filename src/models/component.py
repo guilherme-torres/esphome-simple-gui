@@ -9,8 +9,6 @@ class Component(db.Model):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     component_type: Mapped[str]
-    platform: Mapped[str]
-    name: Mapped[str]
     config_json: Mapped[str]
     device_id: Mapped[int] = mapped_column(ForeignKey("device.id"))
 

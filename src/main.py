@@ -4,12 +4,12 @@ import subprocess
 import threading
 from string import Template
 from src.utils import generate_password, list_serial_ports, dict_to_yaml
-from flask import Flask, redirect, render_template, request, url_for
+from flask import Flask, redirect, render_template, request, url_for, jsonify, render_template_string
 from flask_alembic import Alembic
 from flask_socketio import SocketIO
 from src.database.db import db
 from src.models import Device, Component
-from src.forms import SwitchGPIOForm
+from src.forms import SwitchGPIOForm, SensorDhtForm, ServoForm
 
 
 basic_config_template = """
@@ -79,6 +79,7 @@ def update_device_yaml_file(file_path: str, device_instance: Device):
     components = device_instance.components
     print("componentes:", components)
     if len(components) > 0:
+        # switch
         switches = (
             db.session.execute(
                 db.select(Component).filter_by(
@@ -88,18 +89,67 @@ def update_device_yaml_file(file_path: str, device_instance: Device):
             .scalars()
             .all()
         )
-        switch_dict = {"switch": []}
-        for switch_component in switches:
-            config_json = json.loads(switch_component.config_json)
-            switch_dict["switch"].append(
-                {
-                    "platform": switch_component.platform,
-                    "name": switch_component.name,
-                    **config_json,
-                }
+        if len(switches) > 0:
+            switch_dict = {"switch": []}
+            for switch_component in switches:
+                config_json = json.loads(switch_component.config_json)
+                switch_dict["switch"].append(config_json)
+            with open(device_instance.config_file, "a") as yaml_file:
+                yaml_file.write("\n" + dict_to_yaml(switch_dict))
+
+        # sensor
+        sensors = (
+            db.session.execute(
+                db.select(Component).filter_by(
+                    component_type="sensor", device_id=device_instance.id
+                )
             )
-        with open(device_instance.config_file, "a") as yaml_file:
-            yaml_file.write("\n" + dict_to_yaml(switch_dict))
+            .scalars()
+            .all()
+        )
+        if len(sensors) > 0:
+            sensor_dict = {"sensor": []}
+            for sensor_component in sensors:
+                config_json = json.loads(sensor_component.config_json)
+                sensor_dict["sensor"].append(config_json)
+            with open(device_instance.config_file, "a") as yaml_file:
+                yaml_file.write("\n" + dict_to_yaml(sensor_dict))
+
+        # servo
+        servos = (
+            db.session.execute(
+                db.select(Component).filter_by(
+                    component_type="servo", device_id=device_instance.id
+                )
+            )
+            .scalars()
+            .all()
+        )
+        if len(servos) > 0:
+            servo_dict = {"servo": []}
+            for sensor_component in servos:
+                config_json = json.loads(sensor_component.config_json)
+                servo_dict["servo"].append(config_json)
+            with open(device_instance.config_file, "a") as yaml_file:
+                yaml_file.write("\n" + dict_to_yaml(servo_dict))
+
+        # output
+        outputs = (
+            db.session.execute(
+                db.select(Component).filter_by(
+                    component_type="output", device_id=device_instance.id
+                )
+            )
+            .scalars()
+            .all()
+        )
+        if len(outputs) > 0:
+            output_dict = {"output": []}
+            for output_component in outputs:
+                config_json = json.loads(output_component.config_json)
+                output_dict["output"].append(config_json)
+            with open(device_instance.config_file, "a") as yaml_file:
+                yaml_file.write("\n" + dict_to_yaml(output_dict))
 
 
 @app.route("/create-device", methods=["POST"])
@@ -166,7 +216,6 @@ def delete_device(device_id):
 def edit_device(device_id):
     device = db.session.get(Device, device_id)
     form = SwitchGPIOForm()
-    form.pin.data = "GPIO5"
 
     if device is None:
         print("dispositivo não encontrado")
@@ -211,8 +260,6 @@ def handle_upload(data):
     device_id = data["device_id"]
     serial_port = data["serial_port"]
 
-    # print(device_id, serial_port)
-
     device = db.session.get(Device, device_id)
     if not device:
         socketio.emit("log", {"line": "[Erro] Dispositivo não encontrado."})
@@ -228,32 +275,8 @@ def handle_upload(data):
             socketio.emit("log", {"line": line, "device_id": device_id})
         process.stdout.close()
         process.wait()
-        # socketio.emit("upload_done", {"device_id": device_id})
     
     threading.Thread(target=run_command).start()
-
-
-# @app.route("/upload-config/<int:device_id>", methods=["POST"])
-# def upload_config(device_id):
-#     device = db.session.get(Device, device_id)
-#     if device:
-#         print("fazendo upload para o dispositivo", device.config_file)
-#         serial_port = request.form.get("serial_port")
-#         if serial_port:
-#             print("porta", serial_port)
-#             process = subprocess.Popen(
-#                 ["esphome", "run", device.config_file, "--device", serial_port],
-#                 stdout=subprocess.PIPE,
-#                 stderr=subprocess.STDOUT,
-#                 text=True
-#             )
-#             for line in process.stdout:
-#                 print(line, end="")
-#             return redirect(url_for("list_devices"))
-#         print("porta serial não selecionada")
-#         return redirect(url_for("list_devices"))
-#     print("dispositivo não encontrado")
-#     return redirect(url_for("list_devices"))
 
 
 @app.route("/available-ports")
@@ -268,21 +291,63 @@ def add_component(device_id):
         print("dispositivo não encontrado")
         return redirect(url_for("list_devices"))
     print(f"adicionar componente no dispositivo #{device_id}")
-    component_dict = request.form.to_dict()
+    component_dict = request.form
     print(component_dict)
-    name = component_dict.pop("componentName")
-    component_type = component_dict.pop("componentType")
-    platform = component_dict.pop("componentPlatform")
-    config_json = json.dumps(component_dict)
-    component = Component(
-        component_type=component_type,
-        platform=platform,
-        name=name,
-        config_json=config_json,
-        device_id=device_id,
-    )
-    db.session.add(component)
-    db.session.commit()
+    component_type = component_dict.get("componentType")
+    # config_json = json.dumps(component_dict)
+    match component_type:
+        case "servo":
+            servo_component = Component(
+                component_type=component_type,
+                config_json=json.dumps({
+                    "id": component_dict.get("servo_id"),
+                    "output": component_dict.get("output_id"),
+                }),
+                device_id=device_id,
+            )
+            output_component = Component(
+                component_type="output",
+                config_json=json.dumps({
+                    "platform": component_dict.get("platform"),
+                    "id": component_dict.get("output_id"),
+                    "pin": component_dict.get("pin"),
+                    "frequency": f'{component_dict.get("frequency")} Hz',
+                }),
+                device_id=device_id,
+            )
+            db.session.add(servo_component)
+            db.session.add(output_component)
+            db.session.commit()
+        case "switch":
+            component = Component(
+                component_type=component_type,
+                config_json=json.dumps({
+                    "platform": component_dict.get("platform"),
+                    "name": component_dict.get("name"),
+                    "pin": component_dict.get("pin"),
+                }),
+                device_id=device_id,
+            )
+            db.session.add(component)
+            db.session.commit()
+        case "sensor":
+            component = Component(
+                component_type=component_type,
+                config_json=json.dumps({
+                    "platform": component_dict.get("platform"),
+                    "pin": component_dict.get("pin"),
+                    "temperature": {
+                        "name": component_dict.get("temperature_name")
+                    },
+                    "humidity": {
+                        "name": component_dict.get("humidity_name")
+                    },
+                    "update_interval": f'{component_dict.get("update_interval")}s',
+                }),
+                device_id=device_id,
+            )
+            db.session.add(component)
+            db.session.commit()
     update_device_yaml_file(file_path=device.config_file, device_instance=device)
     return redirect(url_for("edit_device", device_id=device_id))
 
@@ -297,3 +362,73 @@ def delete_component(device_id, component_id):
         db.session.commit()
         update_device_yaml_file(file_path=device.config_file, device_instance=device)
     return redirect(url_for("edit_device", device_id=device_id))
+
+
+forms = {
+    "switch": {
+        "form_class": SwitchGPIOForm,
+        "template": """
+        <div class="mb-3">
+            {{ form.platform.label(class="form-label") }} {{ form.platform(class="form-select") }}
+        </div>
+        <div class="mb-3">
+            {{ form.name.label(class="form-label") }} {{ form.name(class="form-control") }}
+        </div>
+        <div class="mb-3">
+            {{ form.pin.label(class="form-label") }} {{ form.pin(class="form-select") }}
+        </div>
+        """,
+    },
+    "sensor": {
+        "form_class": SensorDhtForm,
+        "template": """
+        <div class="mb-3">
+            {{ form.platform.label(class="form-label") }} {{ form.platform(class="form-select") }}
+        </div>
+        <div class="mb-3">
+            {{ form.pin.label(class="form-label") }} {{ form.pin(class="form-select") }}
+        </div>
+        <div class="mb-3">
+            {{ form.temperature_name.label(class="form-label") }} {{ form.temperature_name(class="form-control") }}
+        </div>
+        <div class="mb-3">
+            {{ form.humidity_name.label(class="form-label") }} {{ form.humidity_name(class="form-control") }}
+        </div>
+        <div class="mb-3">
+            {{ form.update_interval.label(class="form-label") }} {{ form.update_interval(class="form-control", type="number") }}
+        </div>
+        """,
+    },
+    "servo": {
+        "form_class": ServoForm,
+        "template": """
+        <div class="mb-3">
+            {{ form.servo_id.label(class="form-label") }} {{ form.servo_id(class="form-control") }}
+        </div>
+        <div class="mb-3">
+            {{ form.platform.label(class="form-label") }} {{ form.platform(class="form-select") }}
+        </div>
+        <div class="mb-3">
+            {{ form.output_id.label(class="form-label") }} {{ form.output_id(class="form-control") }}
+        </div>
+        <div class="mb-3">
+            {{ form.pin.label(class="form-label") }} {{ form.pin(class="form-select") }}
+        </div>
+        <div class="mb-3">
+            {{ form.frequency.label(class="form-label") }} {{ form.frequency(class="form-control", type="number") }}
+        </div>
+        """,
+    },
+}
+
+@app.route("/select-component-form", methods=["POST"])
+def select_component_form():
+    component_type = request.form.get("component_type")
+    component_form = forms.get(component_type)
+    if not component_form:
+        return jsonify({"html": "<div>Tipo inválido</div>"}), 400
+    html = render_template_string(
+        component_form.get("template"),
+        form=component_form.get("form_class")(),
+    )
+    return jsonify({ "html": html })

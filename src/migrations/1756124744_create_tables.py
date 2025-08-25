@@ -1,8 +1,8 @@
 """create tables
 
-Revision ID: 1755989153
+Revision ID: 1756124744
 Revises: 
-Create Date: 2025-08-23 19:45:53.568018
+Create Date: 2025-08-25 09:25:44.801390
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '1755989153'
+revision: str = '1756124744'
 down_revision: Union[str, Sequence[str], None] = None
 branch_labels: Union[str, Sequence[str], None] = ('default',)
 depends_on: Union[str, Sequence[str], None] = None
@@ -40,8 +40,6 @@ def upgrade() -> None:
     op.create_table('component',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('component_type', sa.String(), nullable=False),
-    sa.Column('platform', sa.String(), nullable=False),
-    sa.Column('name', sa.String(), nullable=False),
     sa.Column('config_json', sa.String(), nullable=False),
     sa.Column('device_id', sa.Integer(), nullable=False),
     sa.ForeignKeyConstraint(['device_id'], ['device.id'], ),
