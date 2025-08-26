@@ -3,13 +3,13 @@ import json
 import subprocess
 import threading
 from string import Template
-from src.utils import generate_password, list_serial_ports, dict_to_yaml
 from flask import Flask, redirect, render_template, request, url_for, jsonify, render_template_string
 from flask_alembic import Alembic
 from flask_socketio import SocketIO
 from src.database.db import db
 from src.models import Device, Component
 from src.forms import SwitchGPIOForm, SensorDhtForm, ServoForm
+from src.utils import generate_password, list_serial_ports, dict_to_yaml
 
 
 basic_config_template = """
@@ -114,6 +114,24 @@ def update_device_yaml_file(file_path: str, device_instance: Device):
                 sensor_dict["sensor"].append(config_json)
             with open(device_instance.config_file, "a") as yaml_file:
                 yaml_file.write("\n" + dict_to_yaml(sensor_dict))
+
+        # number
+        numbers = (
+            db.session.execute(
+                db.select(Component).filter_by(
+                    component_type="number", device_id=device_instance.id
+                )
+            )
+            .scalars()
+            .all()
+        )
+        if len(numbers) > 0:
+            number_dict = {"number": []}
+            for number_component in numbers:
+                config_json = json.loads(number_component.config_json)
+                number_dict["number"].append(config_json)
+            with open(device_instance.config_file, "a") as yaml_file:
+                yaml_file.write("\n" + dict_to_yaml(number_dict))
 
         # servo
         servos = (
@@ -315,8 +333,32 @@ def add_component(device_id):
                 }),
                 device_id=device_id,
             )
+            number_component = Component(
+                component_type="number",
+                config_json=json.dumps({
+                    "platform": "template",
+                    "name": component_dict.get("name"),
+                    "min_value": component_dict.get("min_value", type=int),
+                    "initial_value": component_dict.get("initial_value", type=int),
+                    "max_value": component_dict.get("max_value", type=int),
+                    "step": component_dict.get("step", type=int),
+                    "optimistic": True,
+                    "set_action": {
+                        "then": [
+                            {
+                                "servo.write": {
+                                    "id": component_dict.get("servo_id"),
+                                    "level": f"!lambda return x / {float(component_dict.get('max_value'))};"
+                                },
+                            },
+                        ]
+                    },
+                }),
+                device_id=device_id,
+            )
             db.session.add(servo_component)
             db.session.add(output_component)
+            db.session.add(number_component)
             db.session.commit()
         case "switch":
             component = Component(
@@ -403,6 +445,9 @@ forms = {
         "form_class": ServoForm,
         "template": """
         <div class="mb-3">
+            {{ form.name.label(class="form-label") }} {{ form.name(class="form-control") }}
+        </div>
+        <div class="mb-3">
             {{ form.servo_id.label(class="form-label") }} {{ form.servo_id(class="form-control") }}
         </div>
         <div class="mb-3">
@@ -416,6 +461,18 @@ forms = {
         </div>
         <div class="mb-3">
             {{ form.frequency.label(class="form-label") }} {{ form.frequency(class="form-control", type="number") }}
+        </div>
+        <div class="mb-3">
+            {{ form.min_value.label(class="form-label") }} {{ form.min_value(class="form-control", type="number") }}
+        </div>
+        <div class="mb-3">
+            {{ form.max_value.label(class="form-label") }} {{ form.max_value(class="form-control", type="number") }}
+        </div>
+        <div class="mb-3">
+            {{ form.initial_value.label(class="form-label") }} {{ form.initial_value(class="form-control", type="number") }}
+        </div>
+        <div class="mb-3">
+            {{ form.step.label(class="form-label") }} {{ form.step(class="form-control", type="number") }}
         </div>
         """,
     },

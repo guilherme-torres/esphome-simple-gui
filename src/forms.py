@@ -52,6 +52,7 @@ class SensorDhtForm(FlaskForm):
 
 
 class ServoForm(FlaskForm):
+    name = StringField("Nome", validators=[DataRequired()])
     servo_id = StringField("ID", validators=[DataRequired()])
     platform = SelectField(
         "Plataforma",
@@ -68,3 +69,7 @@ class ServoForm(FlaskForm):
         default="GPIO4",
     )
     frequency = IntegerField("Frequência (Hz)", validators=[DataRequired()], default=50)
+    min_value = IntegerField("Ângulo mínimo", validators=[DataRequired()], default=-180)
+    max_value = IntegerField("Ângulo máximo", validators=[DataRequired()], default=180)
+    initial_value = IntegerField("Ângulo inicial", validators=[DataRequired()], default=180)
+    step = IntegerField("Passo", validators=[DataRequired()], default=1)
