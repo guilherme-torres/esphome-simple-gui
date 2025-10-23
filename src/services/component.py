@@ -79,7 +79,10 @@ class ComponentService:
                     "config_json": json.dumps({
                         "platform": component_dict.get("platform"),
                         "name": component_dict.get("name"),
-                        "pin": component_dict.get("pin"),
+                        "pin": {
+                            "number": component_dict.get("pin"),
+                            "inverted": True if component_dict.get("inverted") == "y" else False,
+                        }
                     }),
                     "device_id": device_id,
                 }
@@ -101,6 +104,21 @@ class ComponentService:
                     "device_id": device_id,
                 }
                 self.component_repository.create(sensor_component_data)
+            case "binary_sensor":
+                binary_sensor_component_data = {
+                    "component_type": component_type,
+                    "config_json": json.dumps({
+                        "platform": component_dict.get("platform"),
+                        "name": component_dict.get("name"),
+                        "pin": {
+                            "number": component_dict.get("pin"),
+                            "inverted": True if component_dict.get("inverted") == "y" else False,
+                        },
+                        **({"device_class": component_dict.get("device_class")} if component_dict.get("device_class") else {}),
+                    }),
+                    "device_id": device_id,
+                }
+                self.component_repository.create(binary_sensor_component_data)
         print("atualizando arquivo de configuração...")
         self.device_service.update_device_config(
             config_file=device.config_file, device_instance=device

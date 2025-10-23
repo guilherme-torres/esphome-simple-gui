@@ -4,7 +4,7 @@ from flask import Flask, request, jsonify, render_template_string
 from flask_alembic import Alembic
 from flask_socketio import SocketIO
 from src.database.db import db
-from src.forms import SwitchGPIOForm, SensorDhtForm, ServoForm
+from src.forms import BinarySensorGPIOForm, SwitchGPIOForm, SensorDhtForm, ServoForm
 from src.utils import list_serial_ports
 from src.repositories.device import DeviceRepository
 from src.repositories.component import ComponentRepository
@@ -97,6 +97,9 @@ forms = {
         <div class="mb-3">
             {{ form.pin.label(class="form-label") }} {{ form.pin(class="form-select") }}
         </div>
+        <div class="mb-3 form-check form-switch">
+            {{ form.inverted.label(class="form-check-label") }} {{ form.inverted(class="form-check-input", type="checkbox") }}
+        </div>
         """,
     },
     "sensor": {
@@ -151,6 +154,26 @@ forms = {
         </div>
         <div class="mb-3">
             {{ form.step.label(class="form-label") }} {{ form.step(class="form-control", type="number") }}
+        </div>
+        """,
+    },
+    "binary_sensor": {
+        "form_class": BinarySensorGPIOForm,
+        "template": """
+        <div class="mb-3">
+            {{ form.platform.label(class="form-label") }} {{ form.platform(class="form-select") }}
+        </div>
+        <div class="mb-3">
+            {{ form.name.label(class="form-label") }} {{ form.name(class="form-control") }}
+        </div>
+        <div class="mb-3">
+            {{ form.pin.label(class="form-label") }} {{ form.pin(class="form-select") }}
+        </div>
+        <div class="mb-3">
+            {{ form.device_class.label(class="form-label") }} {{ form.device_class(class="form-select") }}
+        </div>
+        <div class="mb-3 form-check form-switch">
+            {{ form.inverted.label(class="form-check-label") }} {{ form.inverted(class="form-check-input", type="checkbox") }}
         </div>
         """,
     },

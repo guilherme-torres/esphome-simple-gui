@@ -1,6 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms import SelectField, StringField, IntegerField, ValidationError
-from wtforms.validators import DataRequired
+from wtforms.validators import DataRequired, NumberRange
+from wtforms import BooleanField
 
 
 ESP8266_NODEMCU_PINOUT = [
@@ -26,6 +27,7 @@ class SwitchGPIOForm(FlaskForm):
         choices=ESP8266_NODEMCU_PINOUT,
         default="GPIO5",
     )
+    inverted = BooleanField("Invertido", default=False)
 
 
 class SensorDhtForm(FlaskForm):
@@ -73,3 +75,46 @@ class ServoForm(FlaskForm):
     max_value = IntegerField("Ângulo máximo", validators=[DataRequired()], default=180)
     initial_value = IntegerField("Ângulo inicial", validators=[DataRequired()], default=180)
     step = IntegerField("Passo", validators=[DataRequired()], default=1)
+
+
+class BinarySensorGPIOForm(FlaskForm):
+    platform = SelectField(
+        "Plataforma",
+        validators=[DataRequired()],
+        choices=[("gpio", "GPIO")],
+        default="gpio",
+        id="component_platform",
+    )
+    name = StringField("Nome", validators=[DataRequired()])
+    pin = SelectField(
+        "Pino",
+        validators=[DataRequired()],
+        choices=ESP8266_NODEMCU_PINOUT,
+        default="GPIO14",
+    )
+    device_class = SelectField(
+        "Classe do dispositivo (opcional)",
+        choices=[
+            ("", "Nenhuma"),
+            ("motion", "Movimento"),
+            ("door", "Porta"),
+            ("window", "Janela"),
+            ("moisture", "Umidade"),
+            ("occupancy", "Ocupação"),
+            ("opening", "Abertura"),
+            ("presence", "Presença"),
+            ("safety", "Segurança"),
+            ("vibration", "Vibração"),
+            ("sound", "Som"),
+            ("problem", "Problema"),
+            ("connectivity", "Conectividade"),
+        ],
+        default="",
+    )
+    inverted = BooleanField("Invertido", default=False)
+    # filters_delayed_on = IntegerField(
+    #     "Atraso para ligar (ms)", default=0, validators=[NumberRange(min=0)]
+    # )
+    # filters_delayed_off = IntegerField(
+    #     "Atraso para desligar (ms)", default=0, validators=[NumberRange(min=0)]
+    # )

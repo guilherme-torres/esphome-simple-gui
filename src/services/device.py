@@ -127,6 +127,18 @@ captive_portal:
                     output_dict["output"].append(config_json)
                 with open(device_instance.config_file, "a") as yaml_file:
                     yaml_file.write("\n" + dict_to_yaml(output_dict))
+            # binary sensor
+            binary_sensors = self.component_repository.filter_by({
+                "component_type": "binary_sensor",
+                "device_id": device_instance.id,
+            })
+            if len(binary_sensors) > 0:
+                binary_sensor_dict = {"binary_sensor": []}
+                for binary_sensor_component in binary_sensors:
+                    config_json = json.loads(binary_sensor_component.config_json)
+                    binary_sensor_dict["binary_sensor"].append(config_json)
+                with open(device_instance.config_file, "a") as yaml_file:
+                    yaml_file.write("\n" + dict_to_yaml(binary_sensor_dict))
 
 
     def create_device(self, request: Request):
