@@ -84,6 +84,10 @@ def add_component(device_id):
 def delete_component(device_id, component_id):
     return component_service.delete_component(device_id=device_id, component_id=component_id)
 
+@app.route("/update-component/<int:device_id>/<int:component_id>", methods=["POST"])
+def update_component(device_id, component_id):
+    return component_service.update_component(device_id=device_id, component_id=component_id, request=request)
+
 forms = {
     "switch": {
         "form_class": SwitchGPIOForm,
@@ -110,6 +114,9 @@ forms = {
         </div>
         <div class="mb-3">
             {{ form.pin.label(class="form-label") }} {{ form.pin(class="form-select") }}
+        </div>
+        <div class="mb-3">
+            {{ form.model.label(class="form-label") }} {{ form.model(class="form-select") }}
         </div>
         <div class="mb-3">
             {{ form.temperature_name.label(class="form-label") }} {{ form.temperature_name(class="form-control") }}

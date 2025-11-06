@@ -45,7 +45,13 @@ class SensorDhtForm(FlaskForm):
         default="GPIO4",
     )
     temperature_name = StringField("Nome temperatura", validators=[DataRequired()])
-    humidity_name = StringField("Nome humidade", validators=[DataRequired()])
+    humidity_name = StringField("Nome umidade", validators=[DataRequired()])
+    model = SelectField(
+        "Modelo",
+        validators=[DataRequired()],
+        choices=[("DHT11", "DHT11"), ("DHT22", "DHT22")],
+        default="DHT11",
+    )
     update_interval = IntegerField("Intervalo de atualização (em segundos)", validators=[DataRequired()], default=60)
 
     def validade_update_interval(form, field):

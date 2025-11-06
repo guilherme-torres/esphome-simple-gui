@@ -6,4 +6,5 @@ Flask-SocketIO==5.5.1
 Flask-SQLAlchemy==3.1.1
 Flask-WTF==1.2.2
 PyYAML==6.0.2
+pyserial==3.5
 wheel==0.45.1

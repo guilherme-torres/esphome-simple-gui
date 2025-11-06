@@ -16,6 +16,7 @@ class ComponentService:
         self.device_repository = device_repository
         self.device_service = device_service
 
+
     def create_component(self, device_id, request: Request):
         device = self.device_repository.get(device_id)
         if device is None:
@@ -93,6 +94,7 @@ class ComponentService:
                     "config_json": json.dumps({
                         "platform": component_dict.get("platform"),
                         "pin": component_dict.get("pin"),
+                        "model": component_dict.get("model"),
                         "temperature": {
                             "name": component_dict.get("temperature_name")
                         },
@@ -125,9 +127,65 @@ class ComponentService:
         )
         return redirect(url_for("edit_device", device_id=device_id))
     
+
     def delete_component(self, device_id, component_id):
         component = self.component_repository.delete(component_id)
         if component:
+            device = self.device_repository.get(device_id)
+            print("atualizando arquivo de configuração...")
+            self.device_service.update_device_config(
+                config_file=device.config_file, device_instance=device
+            )
+        return redirect(url_for("edit_device", device_id=device_id))
+    
+
+    def update_component(self, device_id, component_id, request: Request):
+        component = self.component_repository.get(component_id)
+        if component:
+            form_data = request.form
+            component_type = form_data.get("componentType")
+            match component_type:
+                case "sensor":
+                    data = {
+                        "config_json": json.dumps({
+                            "platform": form_data.get("platform"),
+                            "pin": form_data.get("pin"),
+                            "model": form_data.get("model"),
+                            "temperature": {
+                                "name": form_data.get("temperature_name")
+                            },
+                            "humidity": {
+                                "name": form_data.get("humidity_name")
+                            },
+                            "update_interval": f'{form_data.get("update_interval")}s',
+                        })
+                    }
+                    self.component_repository.update(component_id, data)
+                case "switch":
+                    data = {
+                        "config_json": json.dumps({
+                            "platform": form_data.get("platform"),
+                            "name": form_data.get("name"),
+                            "pin": {
+                                "number": form_data.get("pin"),
+                                "inverted": True if form_data.get("inverted") == "y" else False,
+                            }
+                        })
+                    }
+                    self.component_repository.update(component_id, data)
+                case "binary_sensor":
+                    data = {
+                        "config_json": json.dumps({
+                            "platform": form_data.get("platform"),
+                            "name": form_data.get("name"),
+                            "pin": {
+                                "number": form_data.get("pin"),
+                                "inverted": True if form_data.get("inverted") == "y" else False,
+                            },
+                            **({"device_class": form_data.get("device_class")} if form_data.get("device_class") else {}),
+                        })
+                    }
+                    self.component_repository.update(component_id, data)
             device = self.device_repository.get(device_id)
             print("atualizando arquivo de configuração...")
             self.device_service.update_device_config(
